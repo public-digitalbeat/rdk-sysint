@@ -1,0 +1,20 @@
+[Unit]
+Description=SSH Per-Connection Server
+After=network-online.target
+
+[Service]
+Type=forking
+EnvironmentFile=-/etc/default/dropbear
+EnvironmentFile=/etc/device.properties
+ExecStartPre=/bin/sh /lib/rdk/startSSH.sh
+ExecStartPre=/bin/systemctl import-environment IP_ADDRESS_PARAM
+ExecStartPre=/bin/systemctl import-environment DROPBEAR_PARAMS_1
+ExecStartPre=/bin/systemctl import-environment DROPBEAR_PARAMS_2
+ExecStart=/bin/sh -c '/usr/sbin/dropbear -b /etc/sshbanner.txt -a ${IP_ADDRESS_PARAM}'
+ExecStartPost=/bin/sh -c "rm -rf /tmp/.dropbear"
+RestartSec=5s
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
